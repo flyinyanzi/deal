@@ -89,6 +89,7 @@ function initHome(){
 }
 
 function startGame(seed, investor){
+  el('simulationNotice').classList.add('hidden');
   const shuffled = seededShuffle(AMOUNTS, seed);
   state = {
     seed,
@@ -177,13 +178,21 @@ async function caseClicked(no){
 
   c.status='opened';
   renderCases();
-  await revealCase(c);
   renderMoneyBoard();
 
   if(state.simulating){
+    // Critical: post-Deal simulation never opens #caseReveal.
+    await showSimulationNotice(
+      `CASE ${String(c.no).padStart(2,'0')}`,
+      money(c.amount),
+      '这个金额被淘汰了',
+      900
+    );
     await continueSimulationFlow();
     return;
   }
+
+  await revealCase(c);
 
   state.openedThisRound++;
   const need = ROUND_OPEN_COUNTS[state.round];
@@ -342,55 +351,62 @@ function acceptDeal(){
 }
 
 function startPostDealSimulation(){
+  // V2.2 mobile-safe path:
+  // 1) hide the Deal confirmation layer
+  // 2) enter simulation state
+  // 3) DO NOT rebuild cases or launch any overlay
   el('postDealOverlay').classList.add('hidden');
   state.simulating=true;
   updateHeader();
-  renderCases();
+  showSimulationNotice('模拟继续', money(state.acceptedOffer), '接下来看看，如果你当时选择 NO DEAL，会发生什么。', 900);
 }
 
 async function continueSimulationFlow(){
   const closed=state.cases.filter(c=>c.status==='closed');
   if(closed.length<=1){
-    revealOwnedAndFinish();
+    await revealOwnedAndFinish();
     return;
   }
 
-  // 成交后的模拟：继续按原轮次开箱数量推进；为了让玩家手动选择，
-  // 每开一个箱子后判断这一“假轮次”是否应生成假报价。
   state.openedThisRound++;
   const need=ROUND_OPEN_COUNTS[Math.min(state.round,ROUND_OPEN_COUNTS.length-1)] || 1;
 
   if(state.openedThisRound>=need){
     const fake=bankerQuote();
-    state.offers.push({round:state.round+1,offer:fake.offer,ev:fake.ev,ratio:fake.factor,accepted:false,postDeal:true});
-    await showFakeOffer(fake);
+    state.offers.push({
+      round:state.round+1,
+      offer:fake.offer,
+      ev:fake.ev,
+      ratio:fake.factor,
+      accepted:false,
+      postDeal:true
+    });
+
+    await showSimulationNotice(
+      'IF YOU HAD SAID NO DEAL…',
+      money(fake.offer),
+      '银行家此时会报价',
+      1400
+    );
+
     state.round=Math.min(state.round+1,ROUND_OPEN_COUNTS.length-1);
     state.openedThisRound=0;
   }
   updateHeader();
 }
 
-function showFakeOffer(data){
+function showSimulationNotice(label,value,text,duration=1000){
   return new Promise(resolve=>{
-    el('bankerCalling').classList.add('hidden');
-    el('bankerOfferView').classList.remove('hidden');
-    el('bankerOverlay').classList.remove('hidden');
-    el('bankerLine').textContent='“如果你刚才没有成交，我现在会给你……”';
-    el('dealBtn').classList.add('hidden');
-    el('noDealBtn').classList.add('hidden');
-    el('investorPanel').classList.toggle('hidden',!state.investor);
-    if(state.investor){
-      el('evAmount').textContent=money(data.ev);
-      el('offerRatio').textContent=`${(data.factor*100).toFixed(1)}%`;
-      el('riskLabel').textContent=data.risk>1.5?'很高':data.risk>0.9?'高':data.risk>0.5?'中等':'较低';
-    }
-    animateOffer(data.offer);
+    const box=el('simulationNotice');
+    el('simulationNoticeLabel').textContent=label;
+    el('simulationNoticeValue').textContent=value;
+    el('simulationNoticeText').textContent=text;
+    box.classList.remove('hidden');
+
     setTimeout(()=>{
-      el('bankerOverlay').classList.add('hidden');
-      el('dealBtn').classList.remove('hidden');
-      el('noDealBtn').classList.remove('hidden');
+      box.classList.add('hidden');
       resolve();
-    },1800);
+    },duration);
   });
 }
 
@@ -404,6 +420,18 @@ async function revealOwnedAndFinish(){
   const owned=state.cases.find(c=>c.status==='owned');
   if(!owned) return;
   state.finalPrize=owned.amount;
+
+  if(state.simulating){
+    await showSimulationNotice(
+      `YOUR CASE ${String(owned.no).padStart(2,'0')}`,
+      money(owned.amount),
+      '这就是你当时箱子里的金额',
+      1500
+    );
+    showResult();
+    return;
+  }
+
   el('revealCaseNo').textContent=`YOUR CASE ${String(owned.no).padStart(2,'0')}`;
   el('revealAmount').textContent=money(owned.amount);
   el('caseReveal').classList.remove('hidden');
@@ -434,6 +462,7 @@ function classify(){
 }
 
 function showResult(){
+  el('simulationNotice').classList.add('hidden');
   showScreen('resultScreen');
   const won=state.acceptedOffer ?? state.finalPrize;
   const [title,quote]=classify();
