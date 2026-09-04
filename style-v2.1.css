@@ -1,0 +1,270 @@
+:root{
+  --bg:#0d0f12;
+  --panel:#171a20;
+  --panel-2:#20242c;
+  --text:#f4f4f2;
+  --muted:#9ea4ad;
+  --line:rgba(255,255,255,.09);
+  --gold:#d8b25c;
+  --gold-2:#f2d68d;
+  --red:#c84f4f;
+  --green:#4f9e69;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+body{min-height:100svh;background:
+  radial-gradient(circle at 50% -10%,rgba(216,178,92,.15),transparent 33%),
+  linear-gradient(180deg,#111318 0%,#090a0d 100%);
+}
+button{font:inherit}
+.screen{display:none;min-height:100svh}
+.screen.active{display:flex}
+
+.hero{width:min(92vw,560px);margin:auto;padding:48px 20px 40px;text-align:center}
+.eyebrow{font-size:12px;letter-spacing:.24em;color:var(--muted);font-weight:700}
+h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
+.brand{font-size:clamp(62px,17vw,110px);line-height:.95;font-weight:900;letter-spacing:-.06em;color:var(--gold-2);text-shadow:0 0 26px rgba(216,178,92,.2)}
+.tagline{margin:24px 0 30px;color:#d6d8db;line-height:1.8}
+.primary-btn,.ghost-btn{width:100%;border-radius:16px;padding:16px 20px;font-weight:800;cursor:pointer}
+.primary-btn{border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#17130a;box-shadow:0 10px 30px rgba(216,178,92,.16)}
+.primary-btn.small{width:auto;min-width:160px}
+.ghost-btn{margin-top:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text)}
+.mode-card{display:flex;justify-content:space-between;align-items:center;text-align:left;margin:0 0 18px;padding:14px 16px;border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:16px}
+.mode-card strong{display:block}
+.mode-card span{font-size:12px;color:var(--muted)}
+.switch{position:relative;width:48px;height:28px}
+.switch input{display:none}
+.slider{position:absolute;inset:0;background:#333843;border-radius:999px;transition:.2s}
+.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:white;transition:.2s}
+.switch input:checked + .slider{background:var(--gold)}
+.switch input:checked + .slider:before{transform:translateX(20px)}
+.seed-row{display:flex;justify-content:center;gap:10px;margin-top:18px;font-size:12px;color:var(--muted)}
+.seed-row code{color:#d5d6d8}
+.challenge-banner{margin:18px 0;padding:12px 14px;border:1px solid rgba(216,178,92,.3);border-radius:14px;background:rgba(216,178,92,.07);font-size:13px;color:#e8d7ab}
+.hidden{display:none!important}
+
+#gameScreen{flex-direction:column;min-height:100svh}
+.game-header{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 18px 10px}
+.round-label{font-size:16px;font-weight:900;letter-spacing:.05em}
+.instruction{margin-top:3px;font-size:12px;color:var(--muted)}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#ddd;font-size:24px}
+
+.money-board{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;
+  padding:8px 12px 10px;max-width:720px;width:100%;margin:0 auto;
+}
+.money-chip{
+  min-height:28px;display:flex;align-items:center;justify-content:center;
+  padding:4px;border-radius:7px;background:rgba(255,255,255,.055);border:1px solid var(--line);
+  font-size:clamp(9px,2.5vw,12px);font-weight:800;white-space:nowrap;
+}
+.money-chip.high{background:rgba(216,178,92,.08);color:#f2deb2}
+.money-chip.gone{opacity:.19;text-decoration:line-through;transform:scale(.96)}
+
+.stage-wrap{position:relative;flex:1;display:flex;align-items:center;justify-content:center;padding:18px 12px 26px;overflow:hidden}
+.stage-glow{position:absolute;width:80vw;height:80vw;max-width:560px;max-height:560px;border-radius:50%;background:radial-gradient(circle,rgba(216,178,92,.12),transparent 65%);pointer-events:none}
+.cases-grid{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:repeat(5,minmax(54px,1fr));
+  gap:12px 8px;width:min(94vw,620px);align-items:center;
+}
+.case-btn{
+  position:relative;height:54px;border:none;border-radius:10px;cursor:pointer;
+  background:linear-gradient(180deg,#d7b75f 0%,#a77b2f 100%);
+  color:#16120a;font-weight:950;font-size:16px;
+  box-shadow:0 8px 18px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.35);
+  transition:transform .18s,opacity .18s,filter .18s;
+}
+.case-btn:before{content:"";position:absolute;width:24px;height:7px;border:3px solid #8c6828;border-bottom:0;border-radius:8px 8px 0 0;left:50%;top:-7px;transform:translateX(-50%)}
+.case-btn:hover{transform:translateY(-2px)}
+.case-btn.opened{opacity:.1;pointer-events:none;transform:scale(.9)}
+.case-btn.owned{opacity:.2;pointer-events:none}
+.case-btn.sim-mode{filter:saturate(.55)}
+
+.your-case-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px max(18px,env(safe-area-inset-left)) calc(13px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);background:rgba(10,11,14,.88);backdrop-filter:blur(12px)
+}
+.mini-label{font-size:10px;color:var(--muted);letter-spacing:.2em;display:block;margin-bottom:2px}
+.your-case-visual{
+  width:58px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#e4c673,#a77b2f);color:#18130a;font-weight:950;font-size:18px
+}
+.your-case-visual.empty{background:#242831;color:#777}
+
+.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,6,8,.82);backdrop-filter:blur(10px)}
+.reveal-panel,.banker-panel,.post-deal-panel{width:min(92vw,520px);text-align:center}
+.reveal-case-no{font-size:13px;letter-spacing:.18em;color:var(--muted)}
+.big-case{font-size:88px;margin:18px 0 10px}
+.reveal-amount{font-size:clamp(48px,15vw,82px);font-weight:950;color:var(--gold-2);letter-spacing:-.04em}
+.phone{font-size:74px;animation:ring .9s infinite}
+@keyframes ring{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.calling .eyebrow{margin:12px 0 22px}
+.banker-line{min-height:48px;color:#cdd0d4;font-size:15px;margin-bottom:16px}
+.offer-label{font-size:12px;letter-spacing:.15em;color:var(--muted)}
+.offer-amount{font-size:clamp(54px,16vw,94px);font-weight:950;color:var(--gold-2);letter-spacing:-.05em;margin:6px 0 18px}
+.investor-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}
+.investor-panel div{padding:10px 6px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.035)}
+.investor-panel span{display:block;color:var(--muted);font-size:10px}
+.investor-panel strong{display:block;margin-top:4px;font-size:13px}
+.decision-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.deal-btn,.no-deal-btn{border:0;border-radius:16px;padding:16px 10px;font-weight:950;font-size:22px;cursor:pointer}
+.deal-btn{background:linear-gradient(180deg,#74be8b,#45855b);color:#07170c}
+.no-deal-btn{background:linear-gradient(180deg,#db6b6b,#a63f3f);color:#210808}
+.decision-row span{font-size:11px;opacity:.8}
+.post-deal-panel{padding:24px;border:1px solid var(--line);background:#14171c;border-radius:22px}
+.post-deal-panel h3{font-size:28px;margin:10px 0}
+.post-deal-panel p{color:var(--muted);line-height:1.7}
+
+#resultScreen{align-items:center;justify-content:center;padding:28px 18px}
+.result-card{width:min(94vw,560px);padding:28px 22px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));text-align:center}
+.result-card h2{margin:10px 0 8px}
+.result-headline{font-size:clamp(54px,16vw,86px);font-weight:950;color:var(--gold-2);letter-spacing:-.05em}
+.result-quote{color:#d9d3c1;line-height:1.7}
+.result-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}
+.stat-box{padding:14px 10px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
+.stat-box span{font-size:10px;color:var(--muted);display:block}
+.stat-box strong{margin-top:4px;display:block}
+.investor-summary{margin:0 0 18px;padding:14px;border-radius:14px;background:rgba(216,178,92,.07);border:1px solid rgba(216,178,92,.18);font-size:13px;line-height:1.7;color:#e3d5ae}
+
+@media (min-width: 820px){
+  #gameScreen{display:none}
+  #gameScreen.active{
+    display:grid;grid-template-columns:170px 1fr 170px;grid-template-rows:auto 1fr auto;
+    grid-template-areas:"header header header" "money stage money" "footer footer footer";
+  }
+  .game-header{grid-area:header}
+  .money-board{
+    grid-area:money;grid-column:1 / 4;
+    display:grid;grid-template-columns:repeat(2,150px);justify-content:space-between;align-content:center;
+    gap:7px;width:100%;max-width:none;padding:18px 20px;pointer-events:none;
+  }
+  .money-chip{font-size:11px}
+  .stage-wrap{grid-area:stage;grid-column:2}
+  .cases-grid{grid-template-columns:repeat(6,minmax(68px,1fr));gap:16px 12px;width:min(72vw,820px)}
+  .case-btn{height:60px;font-size:17px}
+  .your-case-bar{grid-area:footer}
+}
+
+
+/* V2.0 CLEAN — 基于最初稳定版，仅叠加 UI 改动 */
+.version-badge{
+  margin-top:14px;
+  font-size:11px;
+  letter-spacing:.12em;
+  color:#737983;
+}
+.game-version{
+  position:fixed;
+  right:10px;
+  bottom:74px;
+  z-index:5;
+  font-size:9px;
+  letter-spacing:.08em;
+  color:#6e747d;
+  pointer-events:none;
+}
+
+.game-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:stretch;
+  gap:12px;
+  padding:16px 16px 10px;
+}
+.status-card{
+  flex:1;
+  min-width:0;
+  padding:11px 14px;
+  border-radius:14px;
+  border:1px solid rgba(216,178,92,.20);
+  background:rgba(216,178,92,.08);
+}
+.round-label{
+  font-size:18px;
+  font-weight:950;
+  letter-spacing:.04em;
+  color:#f5e2ad;
+}
+.instruction{
+  margin-top:4px;
+  font-size:14px;
+  font-weight:750;
+  color:#f0f1f2;
+}
+.home-btn{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:0 12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.05);
+  color:#e6e7e9;
+  font-weight:800;
+  font-size:12px;
+  cursor:pointer;
+}
+.home-btn-icon{
+  font-size:24px;
+  line-height:1;
+  margin-top:-2px;
+}
+
+.deal-success-badge{
+  width:82px;
+  height:82px;
+  margin:0 auto 14px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,#79c58f,#43845a);
+  color:#08170d;
+  font-size:23px;
+  font-weight:950;
+}
+.accepted-offer-display{
+  margin:6px 0 16px;
+  font-size:clamp(46px,13vw,72px);
+  font-weight:950;
+  color:var(--gold-2);
+  letter-spacing:-.045em;
+}
+.deal-divider{
+  height:1px;
+  background:var(--line);
+  margin:18px 0 20px;
+}
+
+/* Banker 保持居中，但不改原始 JS 流程 */
+#bankerOverlay{
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(5,6,8,.48);
+  backdrop-filter:none;
+}
+#bankerOverlay .banker-panel{
+  width:min(92vw,520px);
+  max-height:86svh;
+  overflow:auto;
+  padding:18px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.11);
+  background:#15181d;
+  box-shadow:0 18px 48px rgba(0,0,0,.34);
+}
+#bankerOverlay .phone{font-size:64px}
+#bankerOverlay .offer-amount{font-size:clamp(52px,14vw,80px)}
+
+@media (max-width:420px){
+  .game-header{padding-left:12px;padding-right:12px;gap:8px}
+  .status-card{padding:10px 11px}
+  .round-label{font-size:16px}
+  .instruction{font-size:13px}
+  .home-btn{padding:0 9px;font-size:11px}
+}
