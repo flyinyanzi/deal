@@ -12,7 +12,6 @@ const OFFER_RANGES = [
 const el = id => document.getElementById(id);
 
 let state = {};
-let caseInputLocked = false;
 
 function mulberry32(a){
   return function(){
@@ -64,7 +63,6 @@ function compactMoney(v){
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   el(id).classList.add('active');
-  if(id !== 'gameScreen') el('gameScreen').classList.remove('simulation-active');
 }
 
 function parseParams(){
@@ -91,8 +89,6 @@ function initHome(){
 }
 
 function startGame(seed, investor){
-  caseInputLocked = false;
-  el('simulationOfferBar').classList.add('hidden');
   const shuffled = seededShuffle(AMOUNTS, seed);
   state = {
     seed,
@@ -165,8 +161,6 @@ function updateHeader(){
 }
 
 async function caseClicked(no){
-  if(caseInputLocked) return;
-
   const c = state.cases.find(x=>x.no===no);
   if(!c || c.status!=='closed') return;
 
@@ -181,27 +175,22 @@ async function caseClicked(no){
     return;
   }
 
-  caseInputLocked = true;
-  try{
-    c.status='opened';
-    renderCases();
-    await revealCase(c);
-    renderMoneyBoard();
+  c.status='opened';
+  renderCases();
+  await revealCase(c);
+  renderMoneyBoard();
 
-    if(state.simulating){
-      await continueSimulationFlow();
-      return;
-    }
+  if(state.simulating){
+    await continueSimulationFlow();
+    return;
+  }
 
-    state.openedThisRound++;
-    const need = ROUND_OPEN_COUNTS[state.round];
-    updateHeader();
+  state.openedThisRound++;
+  const need = ROUND_OPEN_COUNTS[state.round];
+  updateHeader();
 
-    if(state.openedThisRound >= need){
-      setTimeout(openBankerCall, 350);
-    }
-  } finally {
-    caseInputLocked = false;
+  if(state.openedThisRound >= need){
+    setTimeout(openBankerCall, 350);
   }
 }
 
@@ -288,14 +277,6 @@ function openBankerCall(){
   el('bankerOverlay').classList.remove('hidden');
 }
 
-function closeBankerOverlay(){
-  el('bankerOverlay').classList.add('hidden');
-  el('bankerCalling').classList.remove('hidden');
-  el('bankerOfferView').classList.add('hidden');
-  el('dealBtn').classList.remove('hidden');
-  el('noDealBtn').classList.remove('hidden');
-}
-
 function showOffer(){
   const data=bankerQuote();
   state.currentOffer=data.offer;
@@ -340,7 +321,7 @@ function animateOffer(target){
 }
 
 function noDeal(){
-  closeBankerOverlay();
+  el('bankerOverlay').classList.add('hidden');
   state.round++;
   state.openedThisRound=0;
 
@@ -355,84 +336,61 @@ function acceptDeal(){
   state.acceptedOffer=state.currentOffer;
   state.acceptedRound=state.round+1;
   state.offers[state.offers.length-1].accepted=true;
-  closeBankerOverlay();
+  el('bankerOverlay').classList.add('hidden');
   el('acceptedOfferDisplay').textContent=money(state.acceptedOffer);
   el('postDealOverlay').classList.remove('hidden');
 }
 
 function startPostDealSimulation(){
-  // V1.4：移动 Safari 安全路径。
-  // 不在“继续模拟”这次触摸事件中重建箱子 DOM，也不重新绑定事件。
-  // 成交前的舞台本身已经是正确状态，只需要切换游戏状态即可。
-  if(state.simulating) return;
-
-  const btn = el('continueSimBtn');
-  btn.disabled = true;
-
-  state.simulating = true;
-  state.openedThisRound = 0;
-  el('simulationOfferBar').classList.add('hidden');
-  el('gameScreen').classList.add('simulation-active');
+  el('postDealOverlay').classList.add('hidden');
+  state.simulating=true;
   updateHeader();
-
-  const closed = state.cases.filter(c=>c.status==='closed');
-
-  // 等当前移动端 click/touch 事件完全结束后，再撤掉成交层。
-  // 避免在触摸结束的同一事件栈里让 fixed overlay 消失并暴露底层可点击元素。
-  setTimeout(()=>{
-    el('postDealOverlay').classList.add('hidden');
-    btn.disabled = false;
-
-    if(closed.length===0){
-      revealOwnedAndFinish();
-    }
-  }, 80);
+  renderCases();
 }
 
 async function continueSimulationFlow(){
   const closed=state.cases.filter(c=>c.status==='closed');
-
-  // 只剩自己的箱子 + 最后一个外部箱子时，模拟结束并揭晓自己的箱子。
   if(closed.length<=1){
     revealOwnedAndFinish();
     return;
   }
 
+  // 成交后的模拟：继续按原轮次开箱数量推进；为了让玩家手动选择，
+  // 每开一个箱子后判断这一“假轮次”是否应生成假报价。
   state.openedThisRound++;
   const need=ROUND_OPEN_COUNTS[Math.min(state.round,ROUND_OPEN_COUNTS.length-1)] || 1;
 
   if(state.openedThisRound>=need){
     const fake=bankerQuote();
-    state.offers.push({
-      round:state.round+1,
-      offer:fake.offer,
-      ev:fake.ev,
-      ratio:fake.factor,
-      accepted:false,
-      postDeal:true
-    });
-
-    // 重要：Post-Deal 模拟不再调用 Banker overlay。
-    // 仅在现有游戏 DOM 中显示普通信息条，避免移动 Safari 在
-    // reveal overlay -> banker overlay 连续切换时崩溃。
-    await showSimulationOffer(fake);
-
+    state.offers.push({round:state.round+1,offer:fake.offer,ev:fake.ev,ratio:fake.factor,accepted:false,postDeal:true});
+    await showFakeOffer(fake);
     state.round=Math.min(state.round+1,ROUND_OPEN_COUNTS.length-1);
     state.openedThisRound=0;
   }
   updateHeader();
 }
 
-function showSimulationOffer(data){
+function showFakeOffer(data){
   return new Promise(resolve=>{
-    const bar=el('simulationOfferBar');
-    el('simulationOfferAmount').textContent=money(data.offer);
-    bar.classList.remove('hidden');
-
+    el('bankerCalling').classList.add('hidden');
+    el('bankerOfferView').classList.remove('hidden');
+    el('bankerOverlay').classList.remove('hidden');
+    el('bankerLine').textContent='“如果你刚才没有成交，我现在会给你……”';
+    el('dealBtn').classList.add('hidden');
+    el('noDealBtn').classList.add('hidden');
+    el('investorPanel').classList.toggle('hidden',!state.investor);
+    if(state.investor){
+      el('evAmount').textContent=money(data.ev);
+      el('offerRatio').textContent=`${(data.factor*100).toFixed(1)}%`;
+      el('riskLabel').textContent=data.risk>1.5?'很高':data.risk>0.9?'高':data.risk>0.5?'中等':'较低';
+    }
+    animateOffer(data.offer);
     setTimeout(()=>{
-      bar.classList.add('hidden');
+      el('bankerOverlay').classList.add('hidden');
+      el('dealBtn').classList.remove('hidden');
+      el('noDealBtn').classList.remove('hidden');
       resolve();
-    },1500);
+    },1800);
   });
 }
 
@@ -476,10 +434,6 @@ function classify(){
 }
 
 function showResult(){
-  el('simulationOfferBar').classList.add('hidden');
-  el('gameScreen').classList.remove('simulation-active');
-  closeBankerOverlay();
-  el('postDealOverlay').classList.add('hidden');
   showScreen('resultScreen');
   const won=state.acceptedOffer ?? state.finalPrize;
   const [title,quote]=classify();
