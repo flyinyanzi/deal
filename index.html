@@ -41,11 +41,14 @@
 
     <section id="gameScreen" class="screen">
       <header class="game-header">
-        <div>
+        <div class="status-card">
           <div id="roundLabel" class="round-label">选择你的箱子</div>
           <div id="instruction" class="instruction">它会一直陪你到最后</div>
         </div>
-        <button id="homeBtn" class="icon-btn" aria-label="返回首页">×</button>
+        <button id="homeBtn" class="home-btn" aria-label="返回首页">
+          <span class="home-btn-icon">‹</span>
+          <span>返回首页</span>
+        </button>
       </header>
 
       <div id="moneyBoard" class="money-board"></div>
@@ -118,7 +121,10 @@
 
   <div id="postDealOverlay" class="overlay hidden">
     <div class="post-deal-panel">
-      <div class="eyebrow">成交，但游戏还没结束</div>
+      <div class="deal-success-badge">DEAL!</div>
+      <div class="eyebrow">成交成功</div>
+      <div id="acceptedOfferDisplay" class="accepted-offer-display">¥0</div>
+      <div class="deal-divider"></div>
       <h3>如果你没有成交呢？</h3>
       <p>继续打开剩余箱子，看看银行家到底赢没赢。</p>
       <button id="continueSimBtn" class="primary-btn">继续模拟</button>

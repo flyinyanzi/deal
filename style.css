@@ -45,10 +45,22 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
 .hidden{display:none!important}
 
 #gameScreen{flex-direction:column;min-height:100svh}
-.game-header{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 18px 10px}
-.round-label{font-size:16px;font-weight:900;letter-spacing:.05em}
-.instruction{margin-top:3px;font-size:12px;color:var(--muted)}
-.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#ddd;font-size:24px}
+.game-header{display:flex;justify-content:space-between;align-items:stretch;gap:12px;padding:16px 16px 10px}
+.status-card{
+  flex:1;min-width:0;padding:11px 14px;border-radius:14px;
+  border:1px solid rgba(216,178,92,.20);
+  background:linear-gradient(180deg,rgba(216,178,92,.10),rgba(255,255,255,.035));
+  box-shadow:0 8px 24px rgba(0,0,0,.14);
+}
+.round-label{font-size:18px;font-weight:950;letter-spacing:.04em;color:#f5e2ad}
+.instruction{margin-top:4px;font-size:14px;font-weight:750;color:#f0f1f2}
+.home-btn{
+  flex:0 0 auto;display:flex;align-items:center;gap:5px;
+  padding:0 12px;border-radius:14px;border:1px solid var(--line);
+  background:rgba(255,255,255,.05);color:#e6e7e9;font-weight:800;font-size:12px;cursor:pointer
+}
+.home-btn-icon{font-size:24px;line-height:1;margin-top:-2px}
+.home-btn:hover{background:rgba(255,255,255,.09)}
 
 .money-board{
   display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;
@@ -114,8 +126,20 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
 .deal-btn{background:linear-gradient(180deg,#74be8b,#45855b);color:#07170c}
 .no-deal-btn{background:linear-gradient(180deg,#db6b6b,#a63f3f);color:#210808}
 .decision-row span{font-size:11px;opacity:.8}
-.post-deal-panel{padding:24px;border:1px solid var(--line);background:#14171c;border-radius:22px}
-.post-deal-panel h3{font-size:28px;margin:10px 0}
+.post-deal-panel{padding:28px 24px;border:1px solid rgba(216,178,92,.22);background:#14171c;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.38)}
+.deal-success-badge{
+  width:82px;height:82px;margin:0 auto 14px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#79c58f,#43845a);
+  color:#08170d;font-size:23px;font-weight:950;letter-spacing:.03em;
+  box-shadow:0 0 0 8px rgba(79,158,105,.08),0 14px 34px rgba(0,0,0,.3)
+}
+.accepted-offer-display{
+  margin:6px 0 16px;font-size:clamp(46px,13vw,72px);font-weight:950;
+  color:var(--gold-2);letter-spacing:-.045em
+}
+.deal-divider{height:1px;background:var(--line);margin:18px 0 20px}
+.post-deal-panel h3{font-size:26px;margin:10px 0}
 .post-deal-panel p{color:var(--muted);line-height:1.7}
 
 #resultScreen{align-items:center;justify-content:center;padding:28px 18px}
@@ -146,4 +170,12 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
   .cases-grid{grid-template-columns:repeat(6,minmax(68px,1fr));gap:16px 12px;width:min(72vw,820px)}
   .case-btn{height:60px;font-size:17px}
   .your-case-bar{grid-area:footer}
+}
+
+@media (max-width: 420px){
+  .game-header{padding-left:12px;padding-right:12px;gap:8px}
+  .status-card{padding:10px 11px}
+  .round-label{font-size:16px}
+  .instruction{font-size:13px}
+  .home-btn{padding:0 9px;font-size:11px}
 }

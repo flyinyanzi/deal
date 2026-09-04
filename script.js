@@ -337,6 +337,7 @@ function acceptDeal(){
   state.acceptedRound=state.round+1;
   state.offers[state.offers.length-1].accepted=true;
   el('bankerOverlay').classList.add('hidden');
+  el('acceptedOfferDisplay').textContent=money(state.acceptedOffer);
   el('postDealOverlay').classList.remove('hidden');
 }
 
