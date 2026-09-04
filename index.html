@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#111111" />
+  <title>一掷千金 · DEAL?</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="homeScreen" class="screen active">
+      <div class="hero">
+        <div class="eyebrow">26 CASES · ONE DECISION</div>
+        <h1>一掷千金</h1>
+        <div class="brand">DEAL?</div>
+        <p class="tagline">26 个箱子。一个属于你。<br>银行家随时可以买走它。</p>
+
+        <div id="challengeBanner" class="challenge-banner hidden"></div>
+
+        <div class="mode-card">
+          <div>
+            <strong>投资者模式</strong>
+            <span>显示平均价值与报价比例</span>
+          </div>
+          <label class="switch">
+            <input id="investorToggle" type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button id="startBtn" class="primary-btn">开始游戏</button>
+        <button id="dailyBtn" class="ghost-btn">今日挑战</button>
+
+        <div class="seed-row">
+          <span>本局种子</span>
+          <code id="seedPreview">—</code>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen">
+      <header class="game-header">
+        <div>
+          <div id="roundLabel" class="round-label">选择你的箱子</div>
+          <div id="instruction" class="instruction">它会一直陪你到最后</div>
+        </div>
+        <button id="homeBtn" class="icon-btn" aria-label="返回首页">×</button>
+      </header>
+
+      <div id="moneyBoard" class="money-board"></div>
+
+      <main class="stage-wrap">
+        <div class="stage-glow"></div>
+        <div id="casesGrid" class="cases-grid"></div>
+      </main>
+
+      <footer class="your-case-bar">
+        <div>
+          <span class="mini-label">YOUR CASE</span>
+          <strong id="yourCaseLabel">尚未选择</strong>
+        </div>
+        <div id="yourCaseVisual" class="your-case-visual empty">?</div>
+      </footer>
+    </section>
+
+    <section id="resultScreen" class="screen">
+      <div class="result-card">
+        <div class="eyebrow">GAME RESULT</div>
+        <h2>本局战绩</h2>
+        <div id="resultHeadline" class="result-headline">¥0</div>
+        <p id="resultQuote" class="result-quote"></p>
+
+        <div id="resultStats" class="result-stats"></div>
+
+        <div id="investorSummary" class="investor-summary hidden"></div>
+
+        <button id="challengeBtn" class="primary-btn">挑战同一局</button>
+        <button id="replayBtn" class="ghost-btn">再玩一局</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="caseReveal" class="overlay hidden">
+    <div class="reveal-panel">
+      <div id="revealCaseNo" class="reveal-case-no">CASE 01</div>
+      <div class="big-case">💼</div>
+      <div id="revealAmount" class="reveal-amount">¥0</div>
+    </div>
+  </div>
+
+  <div id="bankerOverlay" class="overlay hidden">
+    <div class="banker-panel">
+      <div id="bankerCalling" class="calling">
+        <div class="phone">☎</div>
+        <div class="eyebrow">BANKER CALLING</div>
+        <button id="answerBtn" class="primary-btn small">接听</button>
+      </div>
+
+      <div id="bankerOfferView" class="offer-view hidden">
+        <div id="bankerLine" class="banker-line">“让我看看你还剩下什么。”</div>
+        <div class="offer-label">银行家报价</div>
+        <div id="offerAmount" class="offer-amount">¥0</div>
+
+        <div id="investorPanel" class="investor-panel hidden">
+          <div><span>剩余平均价值</span><strong id="evAmount">¥0</strong></div>
+          <div><span>报价水平</span><strong id="offerRatio">0%</strong></div>
+          <div><span>风险水平</span><strong id="riskLabel">—</strong></div>
+        </div>
+
+        <div class="decision-row">
+          <button id="dealBtn" class="deal-btn">DEAL<br><span>成交</span></button>
+          <button id="noDealBtn" class="no-deal-btn">NO DEAL<br><span>继续</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="postDealOverlay" class="overlay hidden">
+    <div class="post-deal-panel">
+      <div class="eyebrow">成交，但游戏还没结束</div>
+      <h3>如果你没有成交呢？</h3>
+      <p>继续打开剩余箱子，看看银行家到底赢没赢。</p>
+      <button id="continueSimBtn" class="primary-btn">继续模拟</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
