@@ -63,6 +63,7 @@ function compactMoney(v){
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   el(id).classList.add('active');
+  if(id !== 'gameScreen') el('gameScreen').classList.remove('simulation-active');
 }
 
 function parseParams(){
@@ -277,6 +278,14 @@ function openBankerCall(){
   el('bankerOverlay').classList.remove('hidden');
 }
 
+function closeBankerOverlay(){
+  el('bankerOverlay').classList.add('hidden');
+  el('bankerCalling').classList.remove('hidden');
+  el('bankerOfferView').classList.add('hidden');
+  el('dealBtn').classList.remove('hidden');
+  el('noDealBtn').classList.remove('hidden');
+}
+
 function showOffer(){
   const data=bankerQuote();
   state.currentOffer=data.offer;
@@ -321,7 +330,7 @@ function animateOffer(target){
 }
 
 function noDeal(){
-  el('bankerOverlay').classList.add('hidden');
+  closeBankerOverlay();
   state.round++;
   state.openedThisRound=0;
 
@@ -336,16 +345,36 @@ function acceptDeal(){
   state.acceptedOffer=state.currentOffer;
   state.acceptedRound=state.round+1;
   state.offers[state.offers.length-1].accepted=true;
-  el('bankerOverlay').classList.add('hidden');
+  closeBankerOverlay();
   el('acceptedOfferDisplay').textContent=money(state.acceptedOffer);
   el('postDealOverlay').classList.remove('hidden');
 }
 
 function startPostDealSimulation(){
+  // 显式清理所有可能残留的遮罩状态，避免部分浏览器出现“黑屏但舞台其实还在”的情况。
   el('postDealOverlay').classList.add('hidden');
+  closeBankerOverlay();
+  el('caseReveal').classList.add('hidden');
+
   state.simulating=true;
-  updateHeader();
+  state.openedThisRound=0;
+  el('gameScreen').classList.add('simulation-active');
+
+  const closed = state.cases.filter(c=>c.status==='closed');
+  if(closed.length===0){
+    revealOwnedAndFinish();
+    return;
+  }
+
+  renderMoneyBoard();
   renderCases();
+  updateHeader();
+
+  // 下一帧重新确认游戏屏幕为当前活动页，规避移动端/桌面端 overlay 切换残留。
+  requestAnimationFrame(()=>{
+    showScreen('gameScreen');
+    el('gameScreen').classList.add('simulation-active');
+  });
 }
 
 async function continueSimulationFlow(){
@@ -386,9 +415,7 @@ function showFakeOffer(data){
     }
     animateOffer(data.offer);
     setTimeout(()=>{
-      el('bankerOverlay').classList.add('hidden');
-      el('dealBtn').classList.remove('hidden');
-      el('noDealBtn').classList.remove('hidden');
+      closeBankerOverlay();
       resolve();
     },1800);
   });
@@ -434,6 +461,9 @@ function classify(){
 }
 
 function showResult(){
+  el('gameScreen').classList.remove('simulation-active');
+  closeBankerOverlay();
+  el('postDealOverlay').classList.add('hidden');
   showScreen('resultScreen');
   const won=state.acceptedOffer ?? state.finalPrize;
   const [title,quote]=classify();

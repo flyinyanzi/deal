@@ -179,3 +179,69 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
   .instruction{font-size:13px}
   .home-btn{padding:0 9px;font-size:11px}
 }
+
+
+/* V1.2 — Banker 报价时保留舞台与剩余金额可见 */
+#bankerOverlay{
+  align-items:flex-end;
+  justify-content:center;
+  padding:0;
+  background:linear-gradient(
+    180deg,
+    rgba(5,6,8,.08) 0%,
+    rgba(5,6,8,.15) 34%,
+    rgba(5,6,8,.42) 68%,
+    rgba(5,6,8,.70) 100%
+  );
+  backdrop-filter:none;
+}
+#bankerOverlay .banker-panel{
+  width:min(100%,620px);
+  padding:10px 18px calc(20px + env(safe-area-inset-bottom));
+  border-radius:24px 24px 0 0;
+  border:1px solid rgba(255,255,255,.11);
+  border-bottom:0;
+  background:rgba(18,21,26,.96);
+  box-shadow:0 -18px 60px rgba(0,0,0,.42);
+}
+.banker-sheet-handle{
+  width:42px;height:4px;border-radius:99px;
+  background:rgba(255,255,255,.18);
+  margin:0 auto 12px;
+}
+#bankerOverlay .phone{font-size:54px}
+#bankerOverlay .calling .eyebrow{margin:6px 0 16px}
+#bankerOverlay .banker-line{min-height:auto;margin:0 0 10px}
+#bankerOverlay .offer-amount{font-size:clamp(48px,13vw,76px);margin:2px 0 12px}
+#bankerOverlay .investor-panel{margin-bottom:12px}
+#bankerOverlay .decision-row{margin-top:4px}
+
+/* Deal 成交提示仍然是完整聚焦画面 */
+#postDealOverlay{
+  background:rgba(5,6,8,.78);
+  backdrop-filter:blur(10px);
+}
+
+/* Deal 后模拟时给舞台一个轻微提示，不让用户误以为页面失效 */
+#gameScreen.simulation-active .status-card{
+  border-color:rgba(79,158,105,.35);
+  background:linear-gradient(180deg,rgba(79,158,105,.12),rgba(255,255,255,.035));
+}
+#gameScreen.simulation-active .round-label{
+  color:#a9d9b8;
+}
+
+@media (min-width:820px){
+  #bankerOverlay{
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(5,6,8,.30);
+  }
+  #bankerOverlay .banker-panel{
+    width:min(520px,54vw);
+    border-radius:24px;
+    border:1px solid rgba(255,255,255,.11);
+    padding:14px 22px 22px;
+  }
+}
