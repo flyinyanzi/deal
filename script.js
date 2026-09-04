@@ -12,6 +12,7 @@ const OFFER_RANGES = [
 const el = id => document.getElementById(id);
 
 let state = {};
+let caseInputLocked = false;
 
 function mulberry32(a){
   return function(){
@@ -90,6 +91,7 @@ function initHome(){
 }
 
 function startGame(seed, investor){
+  caseInputLocked = false;
   const shuffled = seededShuffle(AMOUNTS, seed);
   state = {
     seed,
@@ -162,6 +164,8 @@ function updateHeader(){
 }
 
 async function caseClicked(no){
+  if(caseInputLocked) return;
+
   const c = state.cases.find(x=>x.no===no);
   if(!c || c.status!=='closed') return;
 
@@ -176,22 +180,27 @@ async function caseClicked(no){
     return;
   }
 
-  c.status='opened';
-  renderCases();
-  await revealCase(c);
-  renderMoneyBoard();
+  caseInputLocked = true;
+  try{
+    c.status='opened';
+    renderCases();
+    await revealCase(c);
+    renderMoneyBoard();
 
-  if(state.simulating){
-    await continueSimulationFlow();
-    return;
-  }
+    if(state.simulating){
+      await continueSimulationFlow();
+      return;
+    }
 
-  state.openedThisRound++;
-  const need = ROUND_OPEN_COUNTS[state.round];
-  updateHeader();
+    state.openedThisRound++;
+    const need = ROUND_OPEN_COUNTS[state.round];
+    updateHeader();
 
-  if(state.openedThisRound >= need){
-    setTimeout(openBankerCall, 350);
+    if(state.openedThisRound >= need){
+      setTimeout(openBankerCall, 350);
+    }
+  } finally {
+    caseInputLocked = false;
   }
 }
 
@@ -351,26 +360,31 @@ function acceptDeal(){
 }
 
 function startPostDealSimulation(){
-  // Safari-safe：只做一次直接状态切换，不在 overlay 消失的同一帧再切 screen / fixed 图层。
-  el('postDealOverlay').classList.add('hidden');
-  closeBankerOverlay();
-  el('caseReveal').classList.add('hidden');
+  // V1.4：移动 Safari 安全路径。
+  // 不在“继续模拟”这次触摸事件中重建箱子 DOM，也不重新绑定事件。
+  // 成交前的舞台本身已经是正确状态，只需要切换游戏状态即可。
+  if(state.simulating) return;
 
-  state.simulating=true;
-  state.openedThisRound=0;
+  const btn = el('continueSimBtn');
+  btn.disabled = true;
 
-  // 游戏页本来就一直在底层保持 active，不需要重新 showScreen。
+  state.simulating = true;
+  state.openedThisRound = 0;
   el('gameScreen').classList.add('simulation-active');
+  updateHeader();
 
   const closed = state.cases.filter(c=>c.status==='closed');
-  if(closed.length===0){
-    revealOwnedAndFinish();
-    return;
-  }
 
-  renderMoneyBoard();
-  renderCases();
-  updateHeader();
+  // 等当前移动端 click/touch 事件完全结束后，再撤掉成交层。
+  // 避免在触摸结束的同一事件栈里让 fixed overlay 消失并暴露底层可点击元素。
+  setTimeout(()=>{
+    el('postDealOverlay').classList.add('hidden');
+    btn.disabled = false;
+
+    if(closed.length===0){
+      revealOwnedAndFinish();
+    }
+  }, 80);
 }
 
 async function continueSimulationFlow(){

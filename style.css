@@ -357,3 +357,9 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
     padding:18px 22px 22px !important;
   }
 }
+
+/* V1.4 */
+#continueSimBtn:disabled{
+  opacity:.72;
+  pointer-events:none;
+}
