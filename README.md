@@ -1,4 +1,4 @@
-# DEAL? / 一掷千金 V1.4
+# DEAL? / 一掷千金 V1.5
 
 纯前端网页小游戏原型，可直接本地打开，也适合部署到 GitHub Pages。
 
@@ -68,3 +68,10 @@
 - 不再在同一触摸事件栈里隐藏 overlay 后立即暴露并重建底层按钮
 - 延迟 80ms 撤掉成交提示，让移动 Safari 完成当前 touch/click
 - 增加开箱输入锁，防止移动端连续触摸造成异步开箱重入
+
+## V1.5 Post-Deal 模拟重构
+
+- 找到问题边界：Deal 后轮次结束时，旧实现会在开箱 reveal 刚结束后立即启动第二套 Banker overlay
+- Post-Deal 模拟不再调用 Banker overlay、报价动画或 Deal/No Deal DOM
+- 假想 Banker 报价改为游戏舞台内普通信息条
+- 正常游戏的 Banker 来电/报价逻辑完全不变

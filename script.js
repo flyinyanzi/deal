@@ -92,6 +92,7 @@ function initHome(){
 
 function startGame(seed, investor){
   caseInputLocked = false;
+  el('simulationOfferBar').classList.add('hidden');
   const shuffled = seededShuffle(AMOUNTS, seed);
   state = {
     seed,
@@ -370,6 +371,7 @@ function startPostDealSimulation(){
 
   state.simulating = true;
   state.openedThisRound = 0;
+  el('simulationOfferBar').classList.add('hidden');
   el('gameScreen').classList.add('simulation-active');
   updateHeader();
 
@@ -389,52 +391,48 @@ function startPostDealSimulation(){
 
 async function continueSimulationFlow(){
   const closed=state.cases.filter(c=>c.status==='closed');
+
+  // 只剩自己的箱子 + 最后一个外部箱子时，模拟结束并揭晓自己的箱子。
   if(closed.length<=1){
     revealOwnedAndFinish();
     return;
   }
 
-  // 成交后的模拟：继续按原轮次开箱数量推进；为了让玩家手动选择，
-  // 每开一个箱子后判断这一“假轮次”是否应生成假报价。
   state.openedThisRound++;
   const need=ROUND_OPEN_COUNTS[Math.min(state.round,ROUND_OPEN_COUNTS.length-1)] || 1;
 
   if(state.openedThisRound>=need){
     const fake=bankerQuote();
-    state.offers.push({round:state.round+1,offer:fake.offer,ev:fake.ev,ratio:fake.factor,accepted:false,postDeal:true});
-    await showFakeOffer(fake);
+    state.offers.push({
+      round:state.round+1,
+      offer:fake.offer,
+      ev:fake.ev,
+      ratio:fake.factor,
+      accepted:false,
+      postDeal:true
+    });
+
+    // 重要：Post-Deal 模拟不再调用 Banker overlay。
+    // 仅在现有游戏 DOM 中显示普通信息条，避免移动 Safari 在
+    // reveal overlay -> banker overlay 连续切换时崩溃。
+    await showSimulationOffer(fake);
+
     state.round=Math.min(state.round+1,ROUND_OPEN_COUNTS.length-1);
     state.openedThisRound=0;
   }
   updateHeader();
 }
 
-function showFakeOffer(data){
+function showSimulationOffer(data){
   return new Promise(resolve=>{
-    el('bankerCalling').classList.add('hidden');
-    el('bankerOfferView').classList.remove('hidden');
-    el('bankerLine').textContent='“如果你刚才没有成交，我现在会给你……”';
-
-    // 模拟报价时不需要 Deal / No Deal 两个按钮，直接隐藏整块 decision row。
-    document.querySelector('#bankerOfferView .decision-row').classList.add('hidden');
-
-    el('investorPanel').classList.toggle('hidden',!state.investor);
-    if(state.investor){
-      el('evAmount').textContent=money(data.ev);
-      el('offerRatio').textContent=`${(data.factor*100).toFixed(1)}%`;
-      el('riskLabel').textContent=data.risk>1.5?'很高':data.risk>0.9?'高':data.risk>0.5?'中等':'较低';
-    }
-
-    el('bankerOverlay').classList.remove('hidden');
-    animateOffer(data.offer);
+    const bar=el('simulationOfferBar');
+    el('simulationOfferAmount').textContent=money(data.offer);
+    bar.classList.remove('hidden');
 
     setTimeout(()=>{
-      el('bankerOverlay').classList.add('hidden');
-      document.querySelector('#bankerOfferView .decision-row').classList.remove('hidden');
-      el('bankerCalling').classList.remove('hidden');
-      el('bankerOfferView').classList.add('hidden');
+      bar.classList.add('hidden');
       resolve();
-    },1700);
+    },1500);
   });
 }
 
@@ -478,6 +476,7 @@ function classify(){
 }
 
 function showResult(){
+  el('simulationOfferBar').classList.add('hidden');
   el('gameScreen').classList.remove('simulation-active');
   closeBankerOverlay();
   el('postDealOverlay').classList.add('hidden');
