@@ -80,7 +80,7 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
 .case-btn:hover{transform:translateY(-2px)}
 .case-btn.opened{opacity:.1;pointer-events:none;transform:scale(.9)}
 .case-btn.owned{opacity:.2;pointer-events:none}
-.case-btn.sim-mode{filter:saturate(.55)}
+
 
 .your-case-bar{
   display:flex;justify-content:space-between;align-items:center;
@@ -315,4 +315,13 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
     margin-left:12px;
     margin-right:12px;
   }
+}
+
+
+/* V2.3
+   IMPORTANT: never use CSS filter on the whole case grid in simulation mode.
+   Mobile Safari/WebKit can crash when many gradient/shadow buttons are filtered at once. */
+#gameScreen.simulation-active .status-card{
+  border-color:rgba(116,190,139,.30);
+  background:rgba(116,190,139,.07);
 }

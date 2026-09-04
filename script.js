@@ -89,6 +89,7 @@ function initHome(){
 }
 
 function startGame(seed, investor){
+  el('gameScreen').classList.remove('simulation-active');
   el('simulationNotice').classList.add('hidden');
   const shuffled = seededShuffle(AMOUNTS, seed);
   state = {
@@ -136,7 +137,6 @@ function renderCases(){
     let cls='case-btn';
     if(c.status==='opened') cls+=' opened';
     if(c.status==='owned') cls+=' owned';
-    if(state.simulating) cls+=' sim-mode';
     return `<button class="${cls}" data-no="${c.no}">${String(c.no).padStart(2,'0')}</button>`;
   }).join('');
   document.querySelectorAll('.case-btn').forEach(btn=>{
@@ -357,6 +357,7 @@ function startPostDealSimulation(){
   // 3) DO NOT rebuild cases or launch any overlay
   el('postDealOverlay').classList.add('hidden');
   state.simulating=true;
+  el('gameScreen').classList.add('simulation-active');
   updateHeader();
   showSimulationNotice('模拟继续', money(state.acceptedOffer), '接下来看看，如果你当时选择 NO DEAL，会发生什么。', 900);
 }
@@ -462,6 +463,7 @@ function classify(){
 }
 
 function showResult(){
+  el('gameScreen').classList.remove('simulation-active');
   el('simulationNotice').classList.add('hidden');
   showScreen('resultScreen');
   const won=state.acceptedOffer ?? state.finalPrize;
