@@ -1,4 +1,4 @@
-# DEAL? / 一掷千金 V1.2
+# DEAL? / 一掷千金 V1.3
 
 纯前端网页小游戏原型，可直接本地打开，也适合部署到 GitHub Pages。
 
@@ -53,3 +53,11 @@
 - 桌面端报价卡居中浮层，背景仅轻度压暗
 - Deal 后模拟进入时显式清理所有 overlay 状态
 - 模拟阶段顶部状态条增加绿色提示
+
+## V1.3 手机 Safari 稳定性修复
+
+- 去除所有 backdrop-filter / blur 合成层
+- Banker 来电与报价统一改为屏幕中央浮层
+- Deal 后继续模拟不再在 requestAnimationFrame 中重复切换 screen
+- 模拟报价简化 DOM 状态切换，降低移动 Safari 重排/合成压力
+- 手机端减少重阴影与复杂背景合成

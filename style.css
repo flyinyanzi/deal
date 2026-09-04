@@ -97,7 +97,7 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
 .your-case-bar{
   display:flex;justify-content:space-between;align-items:center;
   padding:13px max(18px,env(safe-area-inset-left)) calc(13px + env(safe-area-inset-bottom));
-  border-top:1px solid var(--line);background:rgba(10,11,14,.88);backdrop-filter:blur(12px)
+  border-top:1px solid var(--line);background:rgba(10,11,14,.88);
 }
 .mini-label{font-size:10px;color:var(--muted);letter-spacing:.2em;display:block;margin-bottom:2px}
 .your-case-visual{
@@ -106,7 +106,7 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
 }
 .your-case-visual.empty{background:#242831;color:#777}
 
-.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,6,8,.82);backdrop-filter:blur(10px)}
+.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,6,8,.82);}
 .reveal-panel,.banker-panel,.post-deal-panel{width:min(92vw,520px);text-align:center}
 .reveal-case-no{font-size:13px;letter-spacing:.18em;color:var(--muted)}
 .big-case{font-size:88px;margin:18px 0 10px}
@@ -193,7 +193,7 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
     rgba(5,6,8,.42) 68%,
     rgba(5,6,8,.70) 100%
   );
-  backdrop-filter:none;
+  
 }
 #bankerOverlay .banker-panel{
   width:min(100%,620px);
@@ -219,7 +219,7 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
 /* Deal 成交提示仍然是完整聚焦画面 */
 #postDealOverlay{
   background:rgba(5,6,8,.78);
-  backdrop-filter:blur(10px);
+  ;
 }
 
 /* Deal 后模拟时给舞台一个轻微提示，不让用户误以为页面失效 */
@@ -243,5 +243,117 @@ h1{font-size:clamp(40px,10vw,72px);margin:14px 0 0;letter-spacing:.08em}
     border-radius:24px;
     border:1px solid rgba(255,255,255,.11);
     padding:14px 22px 22px;
+  }
+}
+
+
+/* V1.3 — Mobile Safari 稳定性优先：不使用 backdrop-filter，Banker 始终居中 */
+.overlay{
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
+#bankerOverlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(5,6,8,.46);
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
+#bankerOverlay .banker-panel{
+  width:min(92vw,520px);
+  max-height:86svh;
+  overflow:auto;
+  padding:18px 18px 20px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.11);
+  background:#15181d;
+  box-shadow:0 18px 48px rgba(0,0,0,.34);
+}
+
+#bankerOverlay .banker-sheet-handle{
+  display:none;
+}
+
+#bankerOverlay .phone{
+  font-size:64px;
+}
+
+#bankerOverlay .calling .eyebrow{
+  margin:10px 0 20px;
+}
+
+#bankerOverlay .offer-amount{
+  font-size:clamp(52px,14vw,80px);
+  margin:4px 0 14px;
+}
+
+/* Deal 成交提示：同样只用普通半透明层，不做模糊合成 */
+#postDealOverlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(5,6,8,.60);
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
+#postDealOverlay .post-deal-panel{
+  width:min(92vw,520px);
+  background:#15181d;
+}
+
+/* 开箱 reveal 也取消 blur，降低 Safari 合成压力 */
+#caseReveal{
+  background:rgba(5,6,8,.72);
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
+/* 底部自己的箱子栏避免 blur */
+.your-case-bar{
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  background:#0d0f12;
+}
+
+/* 手机端尽量减少过重的 GPU 阴影 */
+@media (max-width:819px){
+  body{
+    background:#0d0f12;
+  }
+  .stage-glow{
+    background:radial-gradient(circle,rgba(216,178,92,.09),transparent 66%);
+  }
+  #bankerOverlay .banker-panel,
+  #postDealOverlay .post-deal-panel{
+    box-shadow:0 12px 30px rgba(0,0,0,.28);
+  }
+  .case-btn{
+    box-shadow:0 5px 12px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.28);
+  }
+}
+
+/* 覆盖 V1.2 底部 sheet / desktop 特例 */
+@media (min-width:820px){
+  #bankerOverlay{
+    align-items:center !important;
+    justify-content:center !important;
+    padding:24px !important;
+    background:rgba(5,6,8,.38) !important;
+  }
+  #bankerOverlay .banker-panel{
+    width:min(520px,54vw) !important;
+    border-radius:24px !important;
+    border:1px solid rgba(255,255,255,.11) !important;
+    padding:18px 22px 22px !important;
   }
 }

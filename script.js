@@ -351,13 +351,15 @@ function acceptDeal(){
 }
 
 function startPostDealSimulation(){
-  // 显式清理所有可能残留的遮罩状态，避免部分浏览器出现“黑屏但舞台其实还在”的情况。
+  // Safari-safe：只做一次直接状态切换，不在 overlay 消失的同一帧再切 screen / fixed 图层。
   el('postDealOverlay').classList.add('hidden');
   closeBankerOverlay();
   el('caseReveal').classList.add('hidden');
 
   state.simulating=true;
   state.openedThisRound=0;
+
+  // 游戏页本来就一直在底层保持 active，不需要重新 showScreen。
   el('gameScreen').classList.add('simulation-active');
 
   const closed = state.cases.filter(c=>c.status==='closed');
@@ -369,12 +371,6 @@ function startPostDealSimulation(){
   renderMoneyBoard();
   renderCases();
   updateHeader();
-
-  // 下一帧重新确认游戏屏幕为当前活动页，规避移动端/桌面端 overlay 切换残留。
-  requestAnimationFrame(()=>{
-    showScreen('gameScreen');
-    el('gameScreen').classList.add('simulation-active');
-  });
 }
 
 async function continueSimulationFlow(){
@@ -403,21 +399,28 @@ function showFakeOffer(data){
   return new Promise(resolve=>{
     el('bankerCalling').classList.add('hidden');
     el('bankerOfferView').classList.remove('hidden');
-    el('bankerOverlay').classList.remove('hidden');
     el('bankerLine').textContent='“如果你刚才没有成交，我现在会给你……”';
-    el('dealBtn').classList.add('hidden');
-    el('noDealBtn').classList.add('hidden');
+
+    // 模拟报价时不需要 Deal / No Deal 两个按钮，直接隐藏整块 decision row。
+    document.querySelector('#bankerOfferView .decision-row').classList.add('hidden');
+
     el('investorPanel').classList.toggle('hidden',!state.investor);
     if(state.investor){
       el('evAmount').textContent=money(data.ev);
       el('offerRatio').textContent=`${(data.factor*100).toFixed(1)}%`;
       el('riskLabel').textContent=data.risk>1.5?'很高':data.risk>0.9?'高':data.risk>0.5?'中等':'较低';
     }
+
+    el('bankerOverlay').classList.remove('hidden');
     animateOffer(data.offer);
+
     setTimeout(()=>{
-      closeBankerOverlay();
+      el('bankerOverlay').classList.add('hidden');
+      document.querySelector('#bankerOfferView .decision-row').classList.remove('hidden');
+      el('bankerCalling').classList.remove('hidden');
+      el('bankerOfferView').classList.add('hidden');
       resolve();
-    },1800);
+    },1700);
   });
 }
 
